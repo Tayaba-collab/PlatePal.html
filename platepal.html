@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PlatePal - Food Rescue Platform</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script>
+    document.addEventListener('DOMContentLoaded', async function () {
+      const form = document.getElementById('donation-form');
+      const list = document.getElementById('food-list');
+      const filterInput = document.getElementById('food-filter');
+
+      function loadDonations() {
+        const donations = JSON.parse(localStorage.getItem('donations')) || [];
+        list.innerHTML = '';
+        donations.forEach(addDonationToList);
+      }
+
+      function addDonationToList({ name, item, quantity, location }) {
+        const newItem = document.createElement('li');
+        newItem.className = 'p-4 bg-green-50 rounded border';
+        newItem.textContent = `🍽️ ${item} - ${quantity} @ ${location}, Donated by ${name}`;
+        newItem.dataset.item = item.toLowerCase();
+        list.appendChild(newItem);
+      }
+
+      function saveDonation(donation) {
+        const donations = JSON.parse(localStorage.getItem('donations')) || [];
+        donations.push(donation);
+        localStorage.setItem('donations', JSON.stringify(donations));
+      }
+
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const donation = {
+          name: form.name.value.trim(),
+          item: form.item.value.trim(),
+          quantity: form.quantity.value.trim(),
+          location: form.location.value.trim()
+        };
+
+        if (donation.name && donation.item && donation.quantity && donation.location) {
+          console.log('Simulated AI analysis on donation:', donation);
+
+          saveDonation(donation);
+          form.reset();
+          loadDonations();
+        } else {
+          alert('Please fill in all fields.');
+        }
+      });
+
+      filterInput.addEventListener('input', function () {
+        const query = filterInput.value.trim().toLowerCase();
+        const items = list.querySelectorAll('li');
+
+        items.forEach(function (item) {
+          const itemName = item.dataset.item || '';
+          item.style.display = itemName.includes(query) ? 'block' : 'none';
+        });
+      });
+
+      loadDonations();
+    });
+  </script>
+</head>
+<body class="bg-gray-100 text-gray-800">
+  <header class="bg-green-600 text-white py-6 shadow">
+    <div class="container mx-auto px-4 flex justify-between items-center">
+      <h1 class="text-3xl font-bold">🥗 PlatePal</h1>
+      <nav>
+        <a href="#donate" class="mr-4 hover:underline">Donate</a>
+        <a href="#receive" class="mr-4 hover:underline">Receive</a>
+        <a href="#about" class="hover:underline">About</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container mx-auto px-4 py-8">
+    <section class="text-center mb-12">
+      <h2 class="text-4xl font-bold mb-4">Rescue Surplus Food. Feed the Community.</h2>
+      <p class="text-lg text-gray-700 mb-6">Connect donors with those in need through AI-powered logistics.</p>
+      <a href="#donate" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">Get Started</a>
+    </section>
+
+    <section class="bg-white rounded-lg p-6 shadow mb-12">
+      <h3 class="text-2xl font-bold mb-4 text-center">🌍 The Hunger Crisis</h3>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <p class="text-gray-700 mb-4">As of 2023, approximately <strong>733 million people</strong>—or <strong>1 in 11 globally</strong>—experience hunger daily. In <strong>Africa</strong>, this figure rises to <strong>1 in 5 individuals</strong>.</p>
+          <p class="text-gray-700 mb-4">Concurrently, over <strong>1 billion meals</strong> are wasted each day, amounting to <strong>20% of all food produced</strong>, despite the persistent hunger crisis.</p>
+          <p class="text-gray-700 mb-4">To reduce these problems, we’ve created <strong>PlatePal</strong> for the betterment of our community, our nation, our world.</p>
+          <blockquote class="italic border-l-4 border-green-600 pl-4 text-gray-600">"When we have more than we need, it's time to build a longer table, not a higher wall."</blockquote>
+        </div>
+        <div class="space-y-4">
+          <img src="https://images.unsplash.com/photo-1605792657660-596af9009a4a?auto=format&fit=crop&w=800&q=60" alt="Child drinking unsafe water" class="rounded shadow w-full h-auto" />
+          <img src="https://images.unsplash.com/photo-1588776814546-0510c7f47c3e?auto=format&fit=crop&w=800&q=60" alt="Man collecting food from trash" class="rounded shadow w-full h-auto" />
+        </div>
+      </div>
+    </section>
+
+    <section id="donate" class="bg-white rounded-lg p-6 shadow mb-12">
+      <h3 class="text-2xl font-bold mb-4">Donate Surplus Food</h3>
+      <form id="donation-form" class="space-y-4">
+        <input type="text" name="name" placeholder="Your Name" class="w-full p-2 border border-gray-300 rounded" required />
+        <input type="text" name="item" placeholder="Food Item (e.g., Bread, Fruits)" class="w-full p-2 border border-gray-300 rounded" required />
+        <input type="text" name="quantity" placeholder="Quantity / Description" class="w-full p-2 border border-gray-300 rounded" required />
+        <input type="text" name="location" placeholder="Pickup Location" class="w-full p-2 border border-gray-300 rounded" required />
+        <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Submit</button>
+      </form>
+    </section>
+
+    <section id="receive" class="bg-white rounded-lg p-6 shadow mb-12">
+      <h3 class="text-2xl font-bold mb-4">Find Available Food</h3>
+      <p class="mb-4 text-gray-700">AI will recommend food near you based on your dietary preferences and location.</p>
+      <input id="food-filter" type="text" placeholder="Search food item (e.g. rice, apples)" class="w-full mb-4 p-2 border border-gray-300 rounded" />
+      <ul id="food-list" class="space-y-2">
+        <!-- Donated food will appear here -->
+      </ul>
+      <div class="text-center mt-4">
+        <button id="download-csv" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Download CSV</button>
+      </div>
+    </section>
+
+    <section id="about" class="text-center text-gray-700">
+      <h3 class="text-2xl font-bold mb-4">About PlatePal</h3>
+      <p>PlatePal bridges surplus food and hungry mouths using smart AI matchmaking, optimizing pickups, and engaging local volunteers.</p>
+    </section>
+  </main>
+
+  <footer class="bg-green-600 text-white text-center py-4">
+    <p>&copy; 2025 PlatePal. Built to nourish, powered by AI.</p>
+  </footer>
+
+  <script>
+    document.getElementById('download-csv').addEventListener('click', function () {
+      const donations = JSON.parse(localStorage.getItem('donations')) || [];
+      if (!donations.length) {
+        alert('No donations to download.');
+        return;
+      }
+
+      const header = ['Name', 'Item', 'Quantity', 'Location'];
+      const rows = donations.map(({ name, item, quantity, location }) => [name, item, quantity, location]);
+      const csv = [header, ...rows].map(r => r.map(cell => `"${cell}"`).join(',')).join('\n');
+
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'platepal_donations.csv';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+  </script>
+</body>
+</html>
